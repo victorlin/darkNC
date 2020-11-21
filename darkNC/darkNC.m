@@ -45,27 +45,27 @@ static const char * const newBackground;
     return result;
 }
 
-- (void)wb_changeTextColor:(NSView *)view {
+- (void)wb_changeTextColor:(NSView *)view withDepth:(int *) count {
     
     // Get the subviews of the view
     NSArray *subviews = [view subviews];
     
-    // Return if there are no subviews
-    if ([subviews count] == 0) return; // COUNT CHECK LINE
+    // Return if there are no subviews or
+    if ([subviews count] == 0 || (int)count > 30) return; // COUNT CHECK LINE
     
     for (NSView *subview in subviews) {
         
         // Do what you want to do with the subview
         if ([subview respondsToSelector:@selector(setTextColor:)]) {
             if ([self wb_isDark])
-                [(NSTextView*)subview setTextColor:[NSColor whiteColor]];
+                [(NSTextView*)subview setTextColor:[NSColor lightGrayColor]];
             else
                 [(NSTextView*)subview setTextColor:[NSColor blackColor]];
             [subview display];
         }
         
         // List the subviews of subview
-        [self wb_changeTextColor:subview];
+        [self wb_changeTextColor:subview withDepth:(count + 1)];
     }
 }
 
@@ -97,13 +97,13 @@ static const char * const newBackground;
 
 - (void)tabChanged:(id)arg1 {
     [self wb_changeBackgroundColor];
-    [self wb_changeTextColor:ZKHookIvar(self, NSView*, "_contentView")];
+    [self wb_changeTextColor:ZKHookIvar(self, NSView*, "_contentView") withDepth:0];
     ZKOrig(void, arg1);
 }
 
 - (void)willBeShown {
     [self wb_changeBackgroundColor];
-    [self wb_changeTextColor:ZKHookIvar(self, NSView*, "_contentView")];
+    [self wb_changeTextColor:ZKHookIvar(self, NSView*, "_contentView") withDepth:0];
     ZKOrig(void);
 }
 
